@@ -32,6 +32,12 @@ Built separate per-drug datasets, since MOLI is trained per-drug rather than as 
 
 <b>Gene expression data</b> was reduced to 3 principal components via Principal Component Analysis and visualized in a 3D scatter plot. Two broad clusters emerged independent of cancer type labels, suggesting either batch effects or an alternative dominant biological signal (eg. proliferation rate). 
 
+<p align="center">
+<img src="images/gene_expression.png" width="70%">
+<img src="images/mutation.png" width="70%">
+<img src="images/CNA.png" width="70%">
+</p>
+
 ## Architecture and Mathematics
 
 ### <b>Autoencoders:</b>
