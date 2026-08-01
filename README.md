@@ -43,21 +43,38 @@ Built separate per-drug datasets, since MOLI is trained per-drug rather than as 
 ### <b>Autoencoders:</b>
 
 Each omics data type (RNA-seq, mutation, CNA) was split into train/test sets before autoencoder training. Then, each autoencoder was trained on the train set by minimizing reconstruction loss using mean squared error:
+<p align="center">
+<img src="images/Autoencoders.PNG" width="25%">
+</p>
 
 The autoencoder architecture was as follows: encoder → bottleneck (256-dimensional latent representation) → decoder. Only the encoder half of each autoencoder was retained, then used to extract 256-dimensional latent features for both train and test sets. The three encoders’ 256-dimensional outputs were concatenated into a single multi-omics representation (“late integration”) for the neural network model. 
 
 ### <b>Neural Network Architecture:</b>
 
 The concatenated 768-dimensional multi-omics representation was fed through a classifier subnetwork with 2 hidden layers:
+<p align="center">
+<img src="images/NN_architecture.PNG" width="75%">
+</p>
 
 e is a 32-dimensional embedding, where triplet loss operates on. A final linear layer maps the embedding to a single logit, passed through a sigmoid to produce the drug-response probability. The classifier was trained by minimizing a combined loss function of binary-cross entropy and triplet loss (note: λ = 0.1). 
-
+<p align="center">
+<img src="images/NN_architecture2.PNG" width="25%">
+</p>
 
 ### <b>Triplet loss:</b>
 
 Triplet loss operates on the classifier subnetwork's 32-dimensional embedding. For an anchor cell line (a), a positive (p; same drug response label as the anchor), and a negative (n; different label to the anchor), the loss uses Euclidean distance in embedding space to penalize cases where the negative is not at least the margin’s distance farther from the anchor than the positive. 
 
 *Note: PyTorch’s TripletMarginLoss was used, and a margin (α) of 1.0 was applied.
+<p align="center">
+<img src="images/Triplet_loss.PNG" width="70%">
+</p>
+
+where,
+
+<p align="center">
+<img src="images/Triplet_loss2.PNG" width="25%">
+</p>
 
 Triplet loss functions to pull embeddings of cell lines with the same drug response together, while separating cell lines with differing-response.
 
@@ -68,6 +85,17 @@ Triplet loss functions to pull embeddings of cell lines with the same drug respo
 Three loss configurations were compared across 5 seeds on Gemcitabine drug response: triplet + BCE (full model), BCE-only, and contrastive (pairwise) + BCE, with average AUC compared across variants. 
 
 *Note: Contrastive loss is the pairwise alternative to triplet loss: it pulls same-response pairs together and pushes different-response pairs apart by a margin α (set to 1.0) in Euclidean space.
+<p align="center">
+<img src="images/Loss_ablation_study.PNG" width="55%">
+</p>
+
+where,
+<p align="center">
+<img src="images/Loss_ablation_study2.PNG" width="25%">
+,
+<img src="images/Loss_ablation_study3.PNG" width="10%">
+</p>
+
 
 The full model (triplet + BCE) achieved an AUC of 0.696 ± 0.010, exceeding the original paper’s benchmark AUC of 0.65 on TCGA Gemcitabine data [Sharifi-Noghabi et al.]. The BCE-only variant achieved 0.706 ± 0.007, and the contrastive + BCE variant achieved 0.690 ± 0.005. All three variants fell within ~0.016 AUC of one another, with overlapping standard deviations, thus indicating no meaningful difference between the loss variants on this drug. AUC for BCE-only was slightly higher than for triplet + BCE, a direction consistent with the original paper’s pattern for Gemcitabine – though the gap in our replication (0.706 vs 0.696) was considerably smaller than theirs (0.69 vs 0.65). It should be noted that no formal significance test (eg. paired t-test across seeds) was conducted, so this comparison is directional rather than conclusive. 
 
