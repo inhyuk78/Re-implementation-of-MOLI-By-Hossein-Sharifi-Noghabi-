@@ -104,7 +104,8 @@ The full model (triplet + BCE) achieved an AUC of 0.696 ± 0.010, exceeding the 
 - <b>Data leakage (autoencoder stage):</b> Autoencoders were originally trained on the whole data per omics type, with the train/test split only applied after latent feature extraction. This leaked test-set information into the latent representations, despite not touching the labels directly. This was fixed by moving train/test split before autoencoder training, ensuring each autoencoder only saw the train-set during pre-training.
 
 - <b>Data leakage (classifier stage):</b> The contrastive + BCE loss variant initially produced a suspiciously high AUC of ~0.96. This was traced to the training data being included in the test dataloader, meaning the model was being evaluated on previously seen data. This was fixed by correctly loading the test dataloader.
-Model reuse across ablation variants: The same model instance was initially reused across ablation variants instead of being reinitialized between runs. This caused weights learned under one loss variant to be carried over to other variants contaminating comparisons. This was fixed by re-initializing the model from scratch before training each variant.
+
+- <b>Model reuse across ablation variants:</b> The same model instance was initially reused across ablation variants instead of being reinitialized between runs. This caused weights learned under one loss variant to be carried over to other variants contaminating comparisons. This was fixed by re-initializing the model from scratch before training each variant.
 
 ### <b>Future work:</b>
 
