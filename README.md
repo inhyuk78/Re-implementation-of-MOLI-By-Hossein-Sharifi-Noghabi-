@@ -97,7 +97,27 @@ where,
 </p>
 
 
-The full model (triplet + BCE) achieved an AUC of 0.696 ± 0.010, exceeding the original paper’s benchmark AUC of 0.65 on TCGA Gemcitabine data [Sharifi-Noghabi et al.]. The BCE-only variant achieved 0.706 ± 0.007, and the contrastive + BCE variant achieved 0.690 ± 0.005. All three variants fell within ~0.016 AUC of one another, with overlapping standard deviations, thus indicating no meaningful difference between the loss variants on this drug. AUC for BCE-only was slightly higher than for triplet + BCE, a direction consistent with the original paper’s pattern for Gemcitabine – though the gap in our replication (0.706 vs 0.696) was considerably smaller than theirs (0.69 vs 0.65). It should be noted that no formal significance test (eg. paired t-test across seeds) was conducted, so this comparison is directional rather than conclusive. 
+The full model (triplet + BCE) achieved an AUC of 0.696 ± 0.011 (mean ± SD across 5 seeds), the BCE-only variant 0.706 ± 0.007, and the contrastive + BCE variant 0.690 ± 0.006. These are in the range of the original paper's Gemcitabine AUC of 0.65 [Sharifi-Noghabi et al.], although that figure was measured on TCGA patient data, so the two are not directly comparable.
+
+| Seed | Triplet + BCE | BCE-only | Contrastive + BCE |
+|---|---|---|---|
+| 0 | 0.702 | 0.695 | 0.683 |
+| 1 | 0.694 | 0.708 | 0.695 |
+| 2 | 0.708 | 0.711 | 0.689 |
+| 3 | 0.696 | 0.714 | 0.686 |
+| 4 | 0.680 | 0.704 | 0.695 |
+
+### <b>Statistical comparison:</b>
+
+Within each seed, all three variants share the same train/test split, initial weights and batch order, so the results were compared with paired t-tests across seeds.
+
+| Comparison | Mean ΔAUC | t (df = 4) | p |
+|---|---|---|---|
+| BCE-only vs triplet + BCE | +0.010 | 1.81 | 0.144 |
+| BCE-only vs contrastive + BCE | +0.017 | 4.59 | 0.010 |
+| Triplet + BCE vs contrastive + BCE | +0.007 | 1.00 | 0.374 |
+
+BCE-only outperformed contrastive + BCE in all five seeds, and this difference was signficant (p = 0.010). No signficant difference was found between BCE-only and triplet + BCE, or between the two metric-learning variants. Neither metric-learning loss therefore improved on BCE alone for Gemcitabine. BCE-only also scored slightly higher than triplet + BCE, a direction consistent with the original paper's pattern for Gemcitabine, though the gap in our replication (0.706 vs 0.696) was considerably smaller than theirs (0.69 vs 0.65).
 
 ### <b>Bugs & fixes:</b>
 
@@ -109,7 +129,7 @@ The full model (triplet + BCE) achieved an AUC of 0.696 ± 0.010, exceeding the 
 
 ### <b>Future work:</b>
 
-- <b>Statistical comparison across seeds:</b> No formal significance test was conducted for the loss ablation results. Future work should include this to determine whether differences in AUC between loss variants are statistically meaningful or fall within noise. 
+- <b>More seeds:</b> Five seeds give limited statistical power. Running more seeds would show whether the small gap between triplet + BCE and BCE-only is real or noise.
 
 - <b>Further validation on TCGA data:</b> Testing the model on TCGA data, as per the original MOLI paper, would help assess whether the reimplemented model generalizes beyond the current dataset used here.
 
